@@ -39,12 +39,23 @@ final class TodoList
 
     public function getRemainingCount(): int
     {
-        return $this->todoRepository->countOpen();
+        return \count(array_filter(
+            $this->getTodos(),
+            static fn (Todo $todo): bool => !$todo->isDone()
+        ));
+    }
+
+    public function getTotalTodos(): int
+    {
+        return \count($this->getTodos());
     }
 
     public function getCompletedCount(): int
     {
-        return $this->todoRepository->countCompleted();
+        return \count(array_filter(
+            $this->getTodos(),
+            static fn (Todo $todo): bool => $todo->isDone()
+        ));
     }
 
     #[LiveAction]
