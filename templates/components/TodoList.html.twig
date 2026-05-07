@@ -1,25 +1,13 @@
 <section{{ attributes.defaults({class: 'todo-shell'}) }}>
+    <h2 class="mb-3" style="text-align: center;">My Todo List with LiveComponent</h2>
     <header class="todo-shell__header">
-        <div>
-            <p class="todo-shell__eyebrow">Interactive Twig component</p>
-            <h2>Focus queue</h2>
-        </div>
-
-        <div class="todo-stats">
-            <div>
-                <span>{{ computed.remainingCount }}</span>
-                <small>remaining</small>
-            </div>
-            <div>
-                <span>{{ computed.completedCount }}</span>
-                <small>done</small>
-            </div>
-        </div>
+        <twig:TodoStats
+            key="stats-{{ listVersion }}"
+            :totalTodos="computed.totalTodos"
+            :remaining="computed.remainingCount"
+            :completedCount="computed.completedCount"
+        />
     </header>
-
-    <twig:CreateTodo dataModel="listVersion" />
-
-    <p class="todo-hint">Rendered through Twig Components and kept interactive by Symfony UX Live Components.</p>
 
     <div class="todo-list" data-loading="addClass(is-loading)">
         {% for todo in computed.todos %}
@@ -92,4 +80,5 @@
             </div>
         {% endfor %}
     </div>
+     <twig:CreateTodo dataModel="listVersion" />
 </section>

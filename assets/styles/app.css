@@ -89,9 +89,7 @@ input {
 
 .todo-shell__header {
     display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .todo-shell__header h2 {
@@ -103,7 +101,7 @@ input {
 
 .todo-stats {
     display: grid;
-    grid-template-columns: repeat(2, minmax(92px, 1fr));
+    grid-template-columns: repeat(3, minmax(92px, 1fr));
     gap: 0.75rem;
 }
 
