@@ -10,7 +10,7 @@
     </header>
 
     <div class="todo-list" data-loading="addClass(is-loading)">
-        {% for todo in computed.todos %}
+        {% for todo in computed.paginatedTodos %}
             <article key="todo-{{ todo.id }}" class="todo-card{{ todo.done ? ' is-done' }}">
                 <button
                     type="button"
@@ -80,5 +80,27 @@
             </div>
         {% endfor %}
     </div>
-     <twig:CreateTodo dataModel="listVersion" />
+    <p class="todo-hint" style="text-align: center;">Count on current page: {{ computed.paginatedTodos|length }}</p>
+
+    <div class="todo-pagination">
+        <a
+            href="{{ path('todo_path', {'page': currentPage - 1}) }}"
+            class="todo-pagination__button{{ currentPage <= 1 ? ' is-disabled' }}"
+            aria-disabled="{{ currentPage <= 1 ? 'true' : 'false' }}"
+        >
+            Prev
+        </a>
+
+        <span class="todo-pagination__indicator">{{ currentPage }}/{{ totalPages }}</span>
+
+        <a
+            href="{{ path('todo_path', {'page': currentPage + 1}) }}"
+            class="todo-pagination__button{{ currentPage >= totalPages ? ' is-disabled' }}"
+            aria-disabled="{{ currentPage >= totalPages ? 'true' : 'false' }}"
+        >
+            Next
+        </a>
+    </div>
+
+    <twig:CreateTodo dataModel="listVersion" />
 </section>
