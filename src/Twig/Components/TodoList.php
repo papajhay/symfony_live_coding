@@ -23,10 +23,27 @@ final class TodoList
     #[LiveProp(writable: true)]
     public ?int $editingTodoId = null;
 
+    #[LiveProp]
+    public int $page = 1;
+
+    #[LiveProp]
+    public int $currentPage = 1;
+
+    public int $todosPerPage = 7;
+
+    #[LiveProp]
+    public int $totalPages = 1;
+
     public function __construct(
         private readonly TodoRepository $todoRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
+    }
+
+    public function mount(array $data = []): void
+    {
+        $this->currentPage = max(1, (int) ($data['currentPage'] ?? $data['page'] ?? 1));
+        $this->totalPages = max(1, (int) ($data['totalPages'] ?? 1));
     }
 
     /**
@@ -34,26 +51,41 @@ final class TodoList
      */
     public function getTodos(): array
     {
-        return $this->todoRepository->findAllOrdered();
+        $todos = $this->getAllTodos();
+        $this->refreshPaginationMeta(\count($todos));
+
+        return $todos;
+    }
+
+    /**
+     * @return list<Todo>
+     */
+    public function getPaginatedTodos(): array
+    {
+        $todos = $this->getTodos();
+        $offset = ($this->currentPage - 1) * $this->todosPerPage;
+        $paginated = \array_slice($todos, $offset, $this->todosPerPage);
+
+        return $paginated;
     }
 
     public function getRemainingCount(): int
     {
         return \count(array_filter(
-            $this->getTodos(),
+            $this->getAllTodos(),
             static fn (Todo $todo): bool => !$todo->isDone()
         ));
     }
 
     public function getTotalTodos(): int
     {
-        return \count($this->getTodos());
+        return \count($this->getAllTodos());
     }
 
     public function getCompletedCount(): int
     {
         return \count(array_filter(
-            $this->getTodos(),
+            $this->getAllTodos(),
             static fn (Todo $todo): bool => $todo->isDone()
         ));
     }
@@ -74,6 +106,8 @@ final class TodoList
         if ($this->editingTodoId === $todo->getId()) {
             $this->editingTodoId = null;
         }
+
+        $this->refreshPaginationMeta($this->getTotalTodos());
     }
 
     #[LiveAction]
@@ -99,5 +133,21 @@ final class TodoList
     {
         ++$this->listVersion;
         $this->editingTodoId = null;
+    }
+
+    /**
+     * @return list<Todo>
+     */
+    private function getAllTodos(): array
+    {
+        return $this->todoRepository->findAllOrdered();
+    }
+
+    private function refreshPaginationMeta(int $totalTodos): void
+    {
+        $perPage = max(1, $this->todosPerPage);
+        $this->todosPerPage = $perPage;
+        $this->totalPages = max(1, (int) ceil($totalTodos / $perPage));
+        $this->currentPage = max(1, min($this->currentPage, $this->totalPages));
     }
 }

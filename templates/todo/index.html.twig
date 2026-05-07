@@ -4,6 +4,10 @@
 
 {% block body %}
     <main class="page">
-        <twig:TodoList />
+        <twig:TodoList
+            page="{{ page }}"
+            currentPage="{{ currentPage }}"
+            totalPages="{{ totalPages }}"
+        />
     </main>
 {% endblock %}
