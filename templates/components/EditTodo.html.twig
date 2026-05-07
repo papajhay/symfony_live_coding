@@ -1,0 +1,27 @@
+<div {{ attributes }}>
+    {{ form_start(form, {
+        attr: {
+            class: 'todo-form todo-form--edit',
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'updateTodo'
+        }
+    }) }}
+        {{ form_widget(form.title, {
+            attr: {
+                placeholder: 'Task title'
+            }
+        }) }}
+        {{ form_errors(form.title) }}
+
+        {{ form_widget(form.description, {
+            attr: {
+                rows: 3,
+                placeholder: 'Description (optional)'
+            }
+        }) }}
+        {{ form_errors(form.description) }}
+
+        <button type="submit">Save</button>
+    {{ form_end(form) }}
+</div>
+

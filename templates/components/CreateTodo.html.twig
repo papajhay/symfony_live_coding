@@ -1,0 +1,28 @@
+<div {{ attributes }}>
+    {{ form_start(form, {
+        attr: {
+            class: 'todo-form',
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'createTodo'
+        }
+    }) }}
+        {{ form_widget(form.title, {
+            attr: {
+                placeholder: 'Draft the next important task',
+                autocomplete: 'off'
+            }
+        }) }}
+        {{ form_errors(form.title) }}
+
+        {{ form_widget(form.description, {
+            attr: {
+                rows: 3,
+                placeholder: 'Add a short description (optional)'
+            }
+        }) }}
+        {{ form_errors(form.description) }}
+
+        <button type="submit">Add task</button>
+    {{ form_end(form) }}
+</div>
+

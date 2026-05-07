@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Todo Live{% endblock %}
+
+{% block body %}
+    <main class="page">
+        <section class="page__hero">
+            <p class="eyebrow">Symfony 7.4 + UX Live Components</p>
+            <h1>Todo list with interactive Twig components.</h1>
+            <p>Build a reactive interface in PHP and Twig: add tasks, mark them done, and remove them without writing custom frontend JavaScript.</p>
+        </section>
+
+        <twig:TodoList />
+    </main>
+{% endblock %}

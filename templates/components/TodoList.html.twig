@@ -1,0 +1,95 @@
+<section{{ attributes.defaults({class: 'todo-shell'}) }}>
+    <header class="todo-shell__header">
+        <div>
+            <p class="todo-shell__eyebrow">Interactive Twig component</p>
+            <h2>Focus queue</h2>
+        </div>
+
+        <div class="todo-stats">
+            <div>
+                <span>{{ computed.remainingCount }}</span>
+                <small>remaining</small>
+            </div>
+            <div>
+                <span>{{ computed.completedCount }}</span>
+                <small>done</small>
+            </div>
+        </div>
+    </header>
+
+    <twig:CreateTodo dataModel="listVersion" />
+
+    <p class="todo-hint">Rendered through Twig Components and kept interactive by Symfony UX Live Components.</p>
+
+    <div class="todo-list" data-loading="addClass(is-loading)">
+        {% for todo in computed.todos %}
+            <article key="todo-{{ todo.id }}" class="todo-card{{ todo.done ? ' is-done' }}">
+                <button
+                    type="button"
+                    class="todo-card__toggle"
+                    data-action="live#action"
+                    data-live-action-param="toggleTodo"
+                    data-live-todo-param="{{ todo.id }}"
+                    aria-pressed="{{ todo.done ? 'true' : 'false' }}"
+                    aria-label="{{ todo.done ? 'Mark as open' : 'Mark as complete' }}"
+                >
+                    {{ todo.done ? 'True' : 'False' }}
+                </button>
+
+                <div class="todo-card__content">
+                    {% if editingTodoId == todo.id %}
+                        <twig:EditTodo
+                            key="edit-{{ todo.id }}"
+                            todoId="{{ todo.id }}"
+                            dataModel="listVersion"
+                        />
+                    {% else %}
+                        <p class="todo-card__title">{{ todo.title }}</p>
+                        {% if todo.description %}
+                            <p class="todo-card__description">{{ todo.description }}</p>
+                        {% endif %}
+                        <p class="todo-card__meta">Created {{ todo.createdAt|date('M j, Y \\a\\t H:i') }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="todo-card__actions">
+                    {% if editingTodoId == todo.id %}
+                        <button
+                            type="button"
+                            class="todo-card__edit"
+                            data-action="live#action"
+                            data-live-action-param="cancelEdit"
+                        >
+                            Cancel
+                        </button>
+                    {% else %}
+                        <button
+                            type="button"
+                            class="todo-card__edit"
+                            data-action="live#action"
+                            data-live-action-param="startEdit"
+                            data-live-todo-param="{{ todo.id }}"
+                        >
+                            Edit
+                        </button>
+                    {% endif %}
+
+                    <button
+                        type="button"
+                        class="todo-card__delete"
+                        data-action="live#action"
+                        data-live-action-param="deleteTodo"
+                        data-live-todo-param="{{ todo.id }}"
+                    >
+                        Remove
+                    </button>
+                </div>
+            </article>
+        {% else %}
+            <div class="todo-empty">
+                <strong>No tasks yet.</strong>
+                <p>Add the first one above to see the live component update in place.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
