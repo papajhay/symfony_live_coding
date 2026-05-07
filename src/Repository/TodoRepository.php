@@ -22,8 +22,8 @@ class TodoRepository extends ServiceEntityRepository
     public function findAllOrdered(): array
     {
         return $this->createQueryBuilder('todo')
-            ->orderBy('todo.isDone', 'ASC')
-            ->addOrderBy('todo.createdAt', 'ASC')
+            ->orderBy('todo.createdAt', 'DESC')
+            ->addOrderBy('todo.id', 'DESC')
             ->getQuery()
             ->getResult();
     }
