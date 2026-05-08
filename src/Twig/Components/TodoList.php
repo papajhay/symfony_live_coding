@@ -23,6 +23,15 @@ final class TodoList
     #[LiveProp(writable: true)]
     public ?int $editingTodoId = null;
 
+    #[LiveProp(writable: true)]
+    public string $searchQuery = '';
+
+    /**
+     * @var list<int>
+     */
+    #[LiveProp(writable: true)]
+    public array $filteredTodos = [];
+
     #[LiveProp]
     public int $page = 1;
 
@@ -51,7 +60,11 @@ final class TodoList
      */
     public function getTodos(): array
     {
-        $todos = $this->getAllTodos();
+        $todos = $this->applySearch($this->getAllTodos());
+        $this->filteredTodos = array_map(
+            static fn (Todo $todo): int => $todo->getId(),
+            $todos
+        );
         $this->refreshPaginationMeta(\count($todos));
 
         return $todos;
@@ -72,22 +85,38 @@ final class TodoList
     public function getRemainingCount(): int
     {
         return \count(array_filter(
-            $this->getAllTodos(),
+            $this->getTodos(),
             static fn (Todo $todo): bool => !$todo->isDone()
         ));
     }
 
     public function getTotalTodos(): int
     {
-        return \count($this->getAllTodos());
+        return \count($this->getTodos());
     }
 
     public function getCompletedCount(): int
     {
         return \count(array_filter(
-            $this->getAllTodos(),
+            $this->getTodos(),
             static fn (Todo $todo): bool => $todo->isDone()
         ));
+    }
+
+    #[LiveAction]
+    public function searchTodos(): void
+    {
+        $this->currentPage = 1;
+        ++$this->listVersion;
+    }
+
+    #[LiveAction]
+    public function clearSearch(): void
+    {
+        $this->searchQuery = '';
+        $this->filteredTodos = [];
+        $this->currentPage = 1;
+        ++$this->listVersion;
     }
 
     #[LiveAction]
@@ -95,6 +124,7 @@ final class TodoList
     {
         $todo->setDone(!$todo->isDone());
         $this->entityManager->flush();
+        ++$this->listVersion;
     }
 
     #[LiveAction]
@@ -141,6 +171,24 @@ final class TodoList
     private function getAllTodos(): array
     {
         return $this->todoRepository->findAllOrdered();
+    }
+
+    /**
+     * @param list<Todo> $todos
+     *
+     * @return list<Todo>
+     */
+    private function applySearch(array $todos): array
+    {
+        $query = mb_strtolower(trim($this->searchQuery));
+        if ($query == '') {
+            return $todos;
+        }
+
+        return array_values(array_filter(
+            $todos,
+            static fn (Todo $todo): bool => str_contains(mb_strtolower($todo->getTitle()), $query)
+        ));
     }
 
     private function refreshPaginationMeta(int $totalTodos): void
