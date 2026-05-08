@@ -9,20 +9,42 @@
         />
     </header>
 
+    <div class="todo-search">
+        <label for="todo-search-input" class="sr-only">Search todos by title</label>
+        <input
+            id="todo-search-input"
+            type="text"
+            class="todo-search__input"
+            placeholder="Search by title"
+            data-model="searchQuery"
+            data-action="input->live#action"
+            data-live-action-param="searchTodos"
+        >
+        {% if searchQuery %}
+            <button
+                type="button"
+                class="todo-search__clear"
+                data-action="live#action"
+                data-live-action-param="clearSearch"
+                aria-label="Clear search"
+            >
+                X
+            </button>
+        {% endif %}
+    </div>
+
     <div class="todo-list" data-loading="addClass(is-loading)">
         {% for todo in computed.paginatedTodos %}
             <article key="todo-{{ todo.id }}" class="todo-card{{ todo.done ? ' is-done' }}">
-                <button
-                    type="button"
+                <input
+                    type="checkbox"
                     class="todo-card__toggle"
                     data-action="live#action"
                     data-live-action-param="toggleTodo"
                     data-live-todo-param="{{ todo.id }}"
-                    aria-pressed="{{ todo.done ? 'true' : 'false' }}"
+                    {% if todo.done %}checked{% endif %}
                     aria-label="{{ todo.done ? 'Mark as open' : 'Mark as complete' }}"
                 >
-                    {{ todo.done ? 'True' : 'False' }}
-                </button>
 
                 <div class="todo-card__content">
                     {% if editingTodoId == todo.id %}
